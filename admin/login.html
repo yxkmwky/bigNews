@@ -37,14 +37,36 @@
       </form>
     </div>
   </div>
+
+  <!-- 模态框 -->
+  <div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">温馨提示</h4>
+        </div>
+        <div class="modal-body">
+          <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
   <script>
     $(function () {
-      $("input_sub").on("click", function (e) {
+      $(".input_sub").on("click", function (e) {
         e.preventDefault();
-        let username = $("input_txt").val();
-        let password = $("input_pass").val();
-        if (nsername == '' || password == '') {
-          alert("账号密码不能为空！")
+        let username = $(".input_txt").val();
+        let password = $(".input_pass").val();
+        if (username == '' || password == '') {
+          $(".modal-body p").text("用户名和密码不能为空！")
+          $(".modal").modal()
           return
         }
         $.ajax({
@@ -56,9 +78,12 @@
           },
           dataType: "json",
           success: function (response) {
-            alert(response.msg)
+            $(".modal-body p").text(response.msg)
+            $(".modal").modal()
             if (response.code == 200) {
-              window.location.href = "./index.html"
+              $(".modal").on("hide.bs.modal", function () {
+                window.location.href = "./index.html"
+              })
             }
           }
         });
