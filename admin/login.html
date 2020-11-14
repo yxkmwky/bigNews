@@ -37,7 +37,34 @@
       </form>
     </div>
   </div>
-
+  <script>
+    $(function () {
+      $("input_sub").on("click", function (e) {
+        e.preventDefault();
+        let username = $("input_txt").val();
+        let password = $("input_pass").val();
+        if (nsername == '' || password == '') {
+          alert("账号密码不能为空！")
+          return
+        }
+        $.ajax({
+          type: "post",
+          url: "http://localhost:8080/api/v1/admin/user/login",
+          data: {
+            username: username,
+            password: password
+          },
+          dataType: "json",
+          success: function (response) {
+            alert(response.msg)
+            if (response.code == 200) {
+              window.location.href = "./index.html"
+            }
+          }
+        });
+      });
+    })
+  </script>
 </body>
 
 </html>
