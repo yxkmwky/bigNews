@@ -20,7 +20,7 @@
         <a href="#" class="logo"><img src="images/logo02.png" alt="logo"></a>
         <div class="user_info">
             <img src="images/2.jpg" alt="person">
-            <span>欢迎&nbsp;&nbsp;李思思</span>
+            <span>欢迎&nbsp;&nbsp;moren</span>
             <b>管理员</b>
         </div>
         <!-- 左侧导航栏 -->
@@ -54,5 +54,38 @@
 
         </div>
     </div>
+
+    <script>
+        $(function () {
+            // 每个ajax请求都要设置token令牌，所以要全局设置，因为每个页面都要引入jquery.js，所以可以写在jquery.js中
+            //原生js请求将token带过来：设置请求头
+            /* let xhr = new XMLHttpRequest();
+                        xhr.open("get", "http://localhost:8080/api/v1/admin/user/info");
+                        xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+                        xhr.onload = function () {
+                            console.log(xhr.response);
+                        }
+                        xhr.send() */
+
+            // jq发送ajax请求带token过来
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/api/v1/admin/user/info",
+                dataType: "json",
+                headers: {
+                    Authorization: localStorage.getItem("token")
+                },
+                success: function (response) {
+                    // console.log(response);
+                    if (response.code == 200) {
+                        $(".user_info span").html("欢迎&nbsp;&nbsp;" + response.data.nickname);
+                        $(".user_info img").attr("src", response.data.userPic);
+                        $(".user_center_link img").attr("src", response.data.userPic);
+                    }
+                }
+            });
+        })
+    </script>
 </body>
+
 </html>

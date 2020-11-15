@@ -82,6 +82,7 @@
             $(".modal").modal()
             if (response.code == 200) {
               $(".modal").on("hide.bs.modal", function () {
+                localStorage.setItem('token', response.token);
                 window.location.href = "./index.html"
               })
             }
