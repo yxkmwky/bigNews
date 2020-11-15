@@ -84,6 +84,15 @@
                     }
                 }
             });
+
+            // 登出系统：删除token
+            $(".logout").on("click", function (e) {
+                e.preventDefault();
+                if (confirm("你确认要删除吗？")) {
+                    localStorage.removeItem("token");
+                    window.location.href = "./login.html";
+                }
+            });
         })
     </script>
 </body>
