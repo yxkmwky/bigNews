@@ -26,21 +26,46 @@
         </div>
         <!-- 左侧导航栏 -->
         <div class="menu">
-            <div class="level01 active"><a href="#" target="main_frame"><i
-                        class="iconfont icon-yidiandiantubiao04"></i><span>首页</span></a></div>
-            <div class="level01"><a href="#"><i class="iconfont icon-icon-article"></i><span>文章管理</span><b
-                        class="iconfont icon-arrowdownl"></b></a></div>
+            <div class="level01 active">
+                <a href="./main_count.html" target="main_frame">
+                    <i class="iconfont icon-yidiandiantubiao04"></i><span>首页</span>
+                </a>
+            </div>
+            <div class="level01">
+                <!-- <a href="./article_list.html" target="main_frame"> -->
+                <a href="#">
+                    <i class="iconfont icon-icon-article"></i><span>文章管理</span>
+                    <b class="iconfont icon-arrowdownl"></b>
+                </a>
+            </div>
             <ul class="level02">
-                <li><a href="#" target="main_frame"><i class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
-                <li><a href="#" target="main_frame"><i class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
-                <li><a href="#" target="main_frame"><i class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
+                <li>
+                    <a href="./article_list.html" target="main_frame">
+                        <i class="iconfont icon-previewright"></i><span>文章列表</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./article_release.html" target="main_frame">
+                        <i class="iconfont icon-previewright"></i><span>发表文章</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="./article_category.html" target="main_frame">
+                        <i class="iconfont icon-previewright"></i><span>文章类别管理</span>
+                    </a>
                 </li>
             </ul>
 
-            <div class="level01"><a href="#" target="main_frame"><i
-                        class="iconfont icon-comment"></i><span>评论管理</span></a></div>
-            <div class="level01" id="user"><a href="#" target="main_frame"><i
-                        class="iconfont icon-user"></i><span>个人中心</span></a></div>
+            <div class="level01">
+                <a href="./comment_list.html" target="main_frame">
+                    <i class="iconfont icon-comment"></i><span>评论管理</span>
+                </a>
+            </div>
+            <div class="level01" id="user">
+                <a href="./user.html" target="main_frame">
+                    <i class="iconfont icon-user"></i><span>个人中心</span>
+                </a>
+            </div>
         </div>
         <!-- 顶部栏 -->
         <div class="header_bar">
@@ -52,7 +77,8 @@
         </div>
         <!-- 右侧主体内容 -->
         <div class="main" id="main_body">
-
+            <iframe name="main_frame" src="./main_count.html" frameborder="0"
+                style="width: 100%;height: 100%;"></iframe>
         </div>
     </div>
 
@@ -67,7 +93,7 @@
                             console.log(xhr.response);
                         }
                         xhr.send() */
-
+            // $(".menu .level01").eq(0).children("a").trigger("click");
             // jq发送ajax请求带token过来
             $.ajax({
                 type: "get",
@@ -90,11 +116,30 @@
             // 登出系统：删除token
             $(".logout").on("click", function (e) {
                 e.preventDefault();
-                if (confirm("你确认要删除吗？")) {
+                if (confirm("你确认要退出吗？")) {
                     localStorage.removeItem("token");
                     window.location.href = "./login.html";
                 }
             });
+
+            // 左侧侧边栏点击时样式变化
+            $(".menu .level01").on("click", function () {
+                $(this).addClass("active").siblings("div").removeClass("active");
+                // 文章管理
+                if ($(this).index() == 1) {
+                    $(".menu .level02").slideToggle();
+                    $(this).find("b").toggleClass("rotate0");
+                    // $(".menu .level02 li").eq(0).click()
+                    // 事件冒泡，触发a的单击事件，冒泡就会触发a的父元素li的单击事件
+                    // dom元素的单机事件会触发超链接
+                    $(".menu .level02 li").eq(0).find("a")[0].click()
+                }
+            });
+            $(".menu .level02 li").on("click", function () {
+                $(this).addClass("active").siblings("li").removeClass("active");
+            })
+
+
         })
     </script>
 </body>
