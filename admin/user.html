@@ -22,29 +22,29 @@
         <div class="container-fluid common_con">
             <form class="form-horizontal article_form" id="form">
                 <div class="form-group">
-                    <label for="inputEmail1" class="col-sm-2 control-label">用户名称：</label>
+                    <label for="username" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="username" class="form-control username" id="inputEmail1" value="李思思">
+                        <input type="text" name="username" class="form-control username" id="username" value="">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail2" class="col-sm-2 control-label">昵称：</label>
+                    <label for="nickname" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail2" value="哈哈思">
+                        <input type="text" name="nickname" class="form-control nickname" id="nickname" value="">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
+                    <label for="email" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="520@163.com">
+                        <input type="text" name="email" class="form-control email" id="email" value="">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
+                    <label for="userPic" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
-                        <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
+                        <img src="images/2.jpg" alt="" class="user_pic" id="userPic">
+                        <input style="display: none" name="userPic" type="file" class="userPic" id="exampleInputFile">
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
                         <label for="exampleInputFile">
@@ -54,10 +54,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="inputEmail4" class="col-sm-2 control-label">密码：</label>
+                    <label for="password" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" name="password" class="form-control password" id="inputEmail4"
-                            value="12345678">
+                        <input type="password" name="password" class="form-control password" id="password" value="12345678">
                     </div>
                 </div>
                 <div class="form-group">
@@ -68,6 +67,75 @@
             </form>
         </div>
     </div>
+    <script src="./libs/http.js"></script>
+    <script>
+        $(function() {
+            $.ajax({
+                type: "get",
+                url: BigNew.user_detail,
+                dataType: "json",
+                success: function(response) {
+                    if (response.code == 200) {
+                        // $("#username").val(response.data.username);
+                        // $("#nickname").val(response.data.nickname);
+                        // $("#email").val(response.data.email);
+                        // $("#password").val(response.data.password);
+                        for (let key in response.data) {
+                            $("#" + key).val(response.data[key]);
+                        }
+                        $(".user_pic").attr("src", response.data.userPic);
+                    }
+                }
+            });
+
+            // 图像预览
+            $(".userPic").on("change", function() {
+                let file1 = this.files[0];
+                let url = URL.createObjectURL(file1);
+                // console.log(url);
+                $(".user_pic").attr("src", url);
+            });
+
+            // 个人中心编辑
+            $(".btn-edit").on("click", function(e) {
+                e.preventDefault();
+                let form1 = document.querySelector('form');
+                let fd = new FormData(form1);
+                // console.log(fd);
+                $.ajax({
+                    type: "post",
+                    url: BigNew.user_edit,
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.code == 200) {
+                            alert(response.msg)
+                            // 更新页面
+                            // parent.window.location.reload();
+                            $.ajax({
+                                type: "get",
+                                // url: "http://localhost:8080/api/v1/admin/user/info",
+                                url: BigNew.user_info,
+                                dataType: "json",
+                                headers: {
+                                    Authorization: localStorage.getItem("token")
+                                },
+                                success: function(response) {
+                                    // console.log(response);
+                                    if (response.code == 200) {
+                                        parent.$(".user_info span").html("欢迎&nbsp;&nbsp;" + response.data.nickname);
+                                        parent.$(".user_info img").attr("src", response.data.userPic);
+                                        parent.$(".user_center_link img").attr("src", response.data.userPic);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        })
+    </script>
 </body>
 
 </html>
