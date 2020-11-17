@@ -77,13 +77,12 @@
         </div>
         <!-- 右侧主体内容 -->
         <div class="main" id="main_body">
-            <iframe name="main_frame" src="./main_count.html" frameborder="0"
-                style="width: 100%;height: 100%;"></iframe>
+            <iframe name="main_frame" src="./main_count.html" frameborder="0" style="width: 100%;height: 100%;"></iframe>
         </div>
     </div>
 
     <script>
-        $(function () {
+        $(function() {
             // 每个ajax请求都要设置token令牌，所以要全局设置，因为每个页面都要引入jquery.js，所以可以写在jquery.js中
             //原生js请求将token带过来：设置请求头
             /* let xhr = new XMLHttpRequest();
@@ -103,7 +102,7 @@
                 headers: {
                     Authorization: localStorage.getItem("token")
                 },
-                success: function (response) {
+                success: function(response) {
                     // console.log(response);
                     if (response.code == 200) {
                         $(".user_info span").html("欢迎&nbsp;&nbsp;" + response.data.nickname);
@@ -114,7 +113,7 @@
             });
 
             // 登出系统：删除token
-            $(".logout").on("click", function (e) {
+            $(".logout").on("click", function(e) {
                 e.preventDefault();
                 if (confirm("你确认要退出吗？")) {
                     localStorage.removeItem("token");
@@ -123,7 +122,7 @@
             });
 
             // 左侧侧边栏点击时样式变化
-            $(".menu .level01").on("click", function () {
+            $(".menu .level01").on("click", function() {
                 $(this).addClass("active").siblings("div").removeClass("active");
                 // 文章管理
                 if ($(this).index() == 1) {
@@ -135,7 +134,7 @@
                     $(".menu .level02 li").eq(0).find("a")[0].click()
                 }
             });
-            $(".menu .level02 li").on("click", function () {
+            $(".menu .level02 li").on("click", function() {
                 $(this).addClass("active").siblings("li").removeClass("active");
             })
 
