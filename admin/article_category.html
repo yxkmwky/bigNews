@@ -60,6 +60,8 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        <!-- 隐藏域 隐藏要编辑的文章的id-->
+                        <input type="hidden" id="categoryId">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称：</label>
                             <input type="text" class="form-control" id="recipient-name">
@@ -71,7 +73,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="btn-cancel">取消</button>
                     <button type="button" id="btn-add-edit" class="btn btn-primary">Send message</button>
                 </div>
             </div>
@@ -85,8 +87,8 @@
         <td>{{$value.name}}</td>
         <td>{{$value.slug}}</td>
         <td class="text-center">
-            <a href="javascript:;" data-toggle="modal" class=" btn btn-info btn-xs" data-target="#myModal">编辑</a>
-            <a href="javascript:;" data-id="{{$value.id}}" class="btn btn-danger btn-xs">删除</a>
+            <a href="javascript:;" data-id="{{$value.id}}" data-toggle="modal" class=" btn btn-info btn-xs" data-target="#myModal">编辑</a>
+            <a href="javascript:;" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
         </td>
     </tr>
     {{/each}}
@@ -118,6 +120,13 @@
                 } else {
                     $("#myModalLabel").text("编辑分类");
                     $("#btn-add-edit").text("编辑").addClass("btn-success").removeClass("btn-primary");
+
+                    // 把需要编辑的这一行的文章类别和别名显示在模态框中
+                    /* $("#recipient-name").val(e.relatedTarget.parentNode.parentNode.children[0].innerHTML);
+                    $("#message-text").val(e.relatedTarget.parentNode.parentNode.children[1].innerHTML); */
+                    $("#recipient-name").val($(e.relatedTarget).parent().prev().prev().text());
+                    $("#message-text").val($(e.relatedTarget).parent().prev().text());
+                    $("#categoryId").val($(e.relatedTarget).attr("data-id"));
                 }
             });
 
@@ -126,7 +135,11 @@
                 if ($(this).hasClass("btn-primary")) {
                     let name = $("#recipient-name").val().trim();
                     let slug = $("#message-text").val().trim();
-                    console.log(name);
+                    // console.log(name);
+                    if (name == "" || slug == "") {
+                        alert("内容不能为空！")
+                        return
+                    }
                     $.ajax({
                         type: "post",
                         url: BigNew.category_add,
@@ -140,14 +153,66 @@
                                 getData();
                                 $("#recipient-name").val("");
                                 $("#message-text").val("");
-                                $('#myModal').modal('hide')
+                                $('#myModal').modal('hide');
                             }
                         }
                     });
                 } else {
-                    console.log(2);
+                    // 编辑
+                    // console.log(2);
+                    let name = $("#recipient-name").val().trim();
+                    let slug = $("#message-text").val().trim();
+                    let id = $("#categoryId").val().trim();
+                    $.ajax({
+                        type: "post",
+                        url: BigNew.category_edit,
+                        data: {
+                            id: id,
+                            name: name,
+                            slug: slug
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.code == 200) {
+                                alert(response.msg)
+                                getData();
+                                $('#myModal').modal('hide');
+                            }
+                        }
+                    });
                 }
             })
+
+            // 删除
+            $("tbody").on("click", ".btn-delete", function() {
+                let that = $(this)
+                if (confirm("确认删除？")) {
+                    let id = $(this).attr("data-id");
+                    $.ajax({
+                        type: "post",
+                        url: BigNew.category_delete,
+                        data: {
+                            id: id
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            // console.log(response);
+                            if (response.code == 204) {
+                                alert(response.msg)
+                                getData()
+                                // 方法二
+                                that.parent().parent().remove();
+                            }
+                        }
+                    });
+                }
+            });
+
+            // 模态框的取消按钮的点击事件
+            $("#btn-cancel").on("click", function() {
+                // form表单有一个方法 reset() dom方法 可以把form表单中的数据还原成默认值
+                $("#myModal form")[0].reset();
+            });
         })
     </script>
 </body>
