@@ -72,6 +72,29 @@
             </div>
         </div>
     </div>
+
+    <script src="./libs/http.js"></script>
+    <script id='category' type='text/html'>
+        <option value="">所有分类</option>
+        {{each data}}
+        <option value="{{$value.id}}">{{$value.name}}</option>
+        {{/each}}
+    </script>
+    <script>
+        $(function() {
+            //ajax请求获取所有文章类别，然后通过模板引擎渲染到页面上
+            $.ajax({
+                type: "get",
+                url: BigNew.category_list,
+                success: function(response) {
+                    if (response.code == 200) {
+                        let newOpt = template("category", response)
+                        $("#selCategory").html(newOpt);
+                    }
+                }
+            });
+        })
+    </script>
 </body>
 
 </html>
