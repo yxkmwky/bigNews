@@ -134,15 +134,22 @@
                             if (response.data.data.length != 0) {
                                 $("#pagination").show().next().hide();
                                 callback && callback(response);
-                            } else {
+                            }
+                            // 如果当前页为1并且ajax请求也没有数据，就说明是新建分类，没有数据
+                            else if (response.data.data.length == 0 && currentPage == 1) {
                                 $("#pagination").hide().next().show();
+                            }
+                            // 如果最后一页删到了没有数据，即页面总数比原先少了一页的话，就要根据当前页减一页的页数进行页码重构
+                            else if (response.data.totalPage == currentPage - 1 && response.data.data.length == 0) {
+                                currentPage--;
+                                $('#pagination').twbsPagination("changeTotalPages", response.data.totalPage, currentPage)
                             }
                         }
                     }
                 });
             }
 
-
+            let currentPage;
             // 一进到页面就显示默认的文章类别和文章状态下的所有文章
             getData(1, function(response) {
                 window.pagObj = $('#pagination').twbsPagination({
@@ -154,10 +161,49 @@
                     last: '尾页',
                     onPageClick: function(event, page) {
                         // console.info(page + ' (from options)');
+                        currentPage = page
                         getData(page)
                     }
                 })
             })
+
+            // 筛选按钮
+            $("#btnSearch").on("click", function(e) {
+                e.preventDefault();
+                // 把当前页改成1
+                currentPage = 1;
+                getData(1, function(response) {
+                    $('#pagination').twbsPagination("changeTotalPages", response.data.totalPage, 1)
+                })
+            })
+
+            // 删除文章
+            $("tbody").on("click", ".delete", function() {
+                if (confirm("你确定要删除吗？")) {
+                    let id = $(this).attr("data-id")
+                    $.ajax({
+                        type: "post",
+                        url: BigNew.article_delete,
+                        data: {
+                            id: id
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.code == 204) {
+                                alert(response.msg);
+                                // 删除了数据，总的页码有可能减少，应该根据新的总页码重新生成分页结构
+                                getData(currentPage, function(response) {
+                                    $('#pagination').twbsPagination("changeTotalPages", response.data.totalPage, currentPage)
+                                })
+                            }
+                        }
+                    });
+                }
+            });
+
+
+
+            //-----------------------------------------------------------------------------------------------------------
             /* $.ajax({
                 type: "get",
                 url: BigNew.article_query,
@@ -210,12 +256,7 @@
 
 
             // 按钮筛选
-            $("#btnSearch").on("click", function(e) {
-                e.preventDefault();
-                getData(1, function(response) {
-                    $('#pagination').twbsPagination("changeTotalPages", response.data.totalPage, 1)
-                })
-            })
+
 
             /* $("#btnSearch").on("click", function(e) {
                 e.preventDefault();
