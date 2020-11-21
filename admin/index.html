@@ -126,12 +126,12 @@
                 $(this).addClass("active").siblings("div").removeClass("active");
                 // 文章管理
                 if ($(this).index() == 1) {
-                    $(".menu .level02").slideToggle();
+                    $("ul.level02").stop().slideToggle();
                     $(this).find("b").toggleClass("rotate0");
                     // $(".menu .level02 li").eq(0).click()
                     // 事件冒泡，触发a的单击事件，冒泡就会触发a的父元素li的单击事件
                     // dom元素的单机事件会触发超链接
-                    $(".menu .level02 li").eq(0).find("a")[0].click()
+                    $("ul.level02>li:eq(0)>a")[0].click()
                 }
             });
             $(".menu .level02 li").on("click", function() {
