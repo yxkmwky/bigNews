@@ -263,6 +263,16 @@
     {{/each}}
     </script>
 
+    <!-- 最新评论 -->
+    <script id='latestComments' type='text/html'>
+    {{each data v}}
+    <li>
+        <span>{{v.author.charAt(0)}}</span>
+        <b><em>{{v.author}}</em> {{v.date}}说:</b>
+        <strong>{{v.intro}}</strong>
+    </li>
+    {{/each}}
+    </script>
     <script>
         $(function() {
             // 获取最新资讯
@@ -310,6 +320,21 @@
                     }
                 }
             });
+
+            // 最新评论
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/api/v1/index/latest_comment",
+                dataType: "json",
+                success: function(response) {
+                    // console.log(response);
+                    if (response.code == 200) {
+                        let latestComments = template("latestComments", response);
+                        $(".comment_list").html(latestComments);
+                    }
+                }
+            });
+
         })
     </script>
 </body>
