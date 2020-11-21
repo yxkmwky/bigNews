@@ -379,6 +379,11 @@
                 }
             });
 
+            // 文章搜索
+            $(".search_btn").on("click", function() {
+                let key = $(".search_txt").val().trim();
+                window.location.href = "./list.html?key=" + key
+            });
         })
     </script>
 </body>
