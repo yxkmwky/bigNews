@@ -1,6 +1,6 @@
 //使用一个沙箱模式
 ;
-(function (w) {
+(function(w) {
     //声明一个局部变量,记录基地址
     var baseURL = 'http://localhost:8080/api/v1'
     //声明一个对象BigNew,用来记录当前这个项目中所有需要用到的接口地址,
@@ -24,9 +24,24 @@
         comment_pass: baseURL + '/admin/comment/pass', //文章评论通过
         comment_reject: baseURL + '/admin/comment/reject', //文章评论不通过
         comment_delete: baseURL + '/admin/comment/delete', //文章评论删除
+        allData: baseURL + '/admin/data/info', //获取统计数据
+        dayNewArticle: baseURL + '/admin/data/article', //日新增文章数量统计
+        classArticle: baseURL + '/admin/data/category', //各类型文章数量统计
+        dayArticle: baseURL + '/admin/data/visit', //日文章访问量
     };
 
     //暴露接口
     w.BigNew = BigNew;
 
 }(window));
+
+$.ajax({
+    type: "get",
+    url: BigNew.dayArticle,
+    dataType: "json",
+    success: function(response) {
+        if (response.code == 200) {
+            obj = response.data
+        }
+    }
+});
