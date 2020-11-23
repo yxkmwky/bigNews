@@ -131,7 +131,7 @@
         <div class="right_con setfl">
             <div class="common_wrap">
                 <h3><i class="fa fa-bar-chart"></i> 一周热门排行</h3>
-                <ul class="content_list">
+                <ul class="content_list hotrank_list">
                     <li><span class="first">1</span><a href="#">神奇的水滴摄影，泡泡中的世界泡泡中的世界</a></li>
                     <li><span class="second">2</span><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
                     <li><span class="third">3</span><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
@@ -208,7 +208,142 @@
     <!-- 引入模板引擎js文件 -->
     <script src="./js/template-web.js"></script>
     <script src="./js/jquery-1.12.4.min.js"></script>
+    <!-- 评论模板 -->
+    <script id='comments' type='text/html'>
+    {{each data v}}
+    <div class="comment_detail_list">
+        <div class="person_pic fl">{{v.author.charAt(0)}}</div>
+        <div class="name_time fl"><b>{{v.author}}</b><span>{{v.date}} {{v.time}}</span></div>
+        <div class="comment_text fl">
+            {{v.content}}
+        </div>
+    </div>
+    {{/each}}
+    </script>
 
+    <!-- 一周热门排行榜 -->
+    <script id='hotList' type='text/html'>
+    {{each data v}}
+    <li><span>{{$index+1}}</span><a href="./article.html?id={{v.id}}">{{v.title}}</a></li>
+    {{/each}}
+    </script>
+
+    <!-- 最新评论 -->
+    <script id='latestComments' type='text/html'>
+    {{each data v}}
+    <li>
+        <span>{{v.author.charAt(0)}}</span>
+        <b><em>{{v.author}}</em> {{v.date}}说:</b>
+        <strong>{{v.intro}}</strong>
+    </li>
+    {{/each}}
+    </script>
+
+    <!-- 焦点关注 -->
+    <script id='focus' type='text/html'>
+    {{each data v}}
+    <li><a href="./article.html?id={{v.id}}">{{v.intro}}</a></li>
+    {{/each}}
+    </script>
+
+    <!-- 全部分类 -->
+    <script id='allClass' type='text/html'>
+    {{each data v}}
+    <li><a href="./list.html?id={{v.id}}">{{v.name}}</a></li>
+    {{/each}}
+    </script>
+
+    <script>
+        $(function() {
+            let id = window.location.search.split("=")[1]
+            // console.log(id);
+            if (id == undefined) {
+                window.location.href = "./index.html"
+            } else {
+                $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/v1/index/article",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        // console.log(response);
+                        if (response.code == 200) {
+                            $(".breadcrumb a").eq(1).html(response.data.category);
+                            $(".article_title").html(response.data.title);
+                            $(".article_con").html(response.data.content);
+                            if (response.data.prev == null) {
+                                $(".article_links>a:eq(0)").text("没有上一篇")
+                            } else {
+                                $(".article_links>a:eq(0)").text(response.data.prev.title)
+                                $(".article_links>a:eq(0)").attr("href", "./article.html?id=" + response.data.prev.id)
+                            }
+                            if (response.data.next == null) {
+                                $(".article_links>a:eq(1)").text("没有下一篇")
+                            } else {
+                                $(".article_links>a:eq(1)").text(response.data.next.title)
+                                $(".article_links>a:eq(1)").attr("href", "./article.html?id=" + response.data.next.id)
+                            }
+
+                            $(".article_info").html(response.data.author + " 发布于 " + response.data.date + "&nbsp;&nbsp;&nbsp;分类: " + response.data.category + "&nbsp;&nbsp;&nbsp;阅读:(" + response.data.read + ")&nbsp;&nbsp;&nbsp;评论: (" + response.data.comments + ")");
+                        }
+                    }
+                });
+            }
+
+            // 评论列表
+            $.ajax({
+                type: "get",
+                url: "http://localhost:8080/api/v1/index/get_comment",
+                data: {
+                    articleId: id
+                },
+                dataType: "json",
+                success: function(response) {
+                    // console.log(response);
+                    if (response.code == 200) {
+                        let comments = template("comments", response)
+                        $(".comment_list_con").html(comments);
+                        $(".comment_count").html(response.data.length + "条评论");
+                    }
+                }
+            });
+
+            // 发表评论
+            $(".comment_sub").on("click", function(e) {
+                e.preventDefault();
+                let username = $(".comment_name").val().trim();
+                let useContent = $(".comment_input").val().trim();
+                if (username == "" || useContent == "") {
+                    alert("内容不能为空！")
+                    return
+                }
+                $.ajax({
+                    type: "post",
+                    url: "http://localhost:8080/api/v1/index/post_comment",
+                    data: {
+                        author: username,
+                        content: useContent,
+                        articleId: id
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        // console.log(response);
+                        if (response.code == 201) {
+                            alert(response.msg);
+                            $(".comment_name").val("");
+                            $(".comment_input").val("");
+                            window.location.reload()
+                        }
+                    }
+                });
+            });
+
+        })
+    </script>
+
+    <script src="./js/same.js"></script>
 </body>
 
 </html>

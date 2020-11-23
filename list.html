@@ -12,6 +12,18 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="js/jquery.pagination.min.js"></script>
+    <style>
+        #pagination {
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            margin-left: -50px;
+        }
+
+        .main_con {
+            position: relative;
+        }
+    </style>
 </head>
 
 <body>
@@ -63,7 +75,7 @@
                 <h3>科 技</h3>
             </div>
 
-            <div class="common_news_list">
+            <!-- <div class="common_news_list">
                 <a href="#" class="list_pic"><img src="images/pic09.jpg" alt=""></a>
                 <h4><a href="#">亚马逊金融试水中国？背后却是和华尔街的“金融战争” </a></h4>
                 <p>亚马逊抛弃了中国的买家们，却难以割舍庞大的卖家市场，有消息指出亚马逊中国将针对中国庞大的卖家群体推出一项贷款推荐计划。在连续对印度、墨西哥等新兴市场大力推广线上支付服务后，亚马逊金融试水进军中国市场的信号终于被放出。
@@ -133,26 +145,27 @@
                         )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( 10 )</span>
                     <b>发布于 2018-08-30 12:18:58</b>
                 </div>
-            </div>
+            </div> -->
 
-            <div id="pagination" class="page"></div>
-            <script>
-                $(function () {
+
+            <!-- <script>
+                $(function() {
                     $("#pagination").pagination({
-                        currentPage: 2,
+                        currentPage: 1,
                         totalPage: 8,
-                        callback: function (current) {
+                        callback: function(current) {
                             alert('ok!');
                         }
                     });
                 });
-            </script>
+            </script> -->
 
         </div>
+        <div id="pagination" class="page"></div>
         <div class="right_con setfl">
             <div class="common_wrap">
                 <h3><i class="fa fa-bar-chart"></i> 一周热门排行</h3>
-                <ul class="content_list">
+                <ul class="content_list hotrank_list">
                     <li><span class="first">1</span><a href="#">神奇的水滴摄影，泡泡中的世界泡泡中的世界</a></li>
                     <li><span class="second">2</span><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
                     <li><span class="third">3</span><a href="#">神奇的水滴摄影，泡泡中的世界</a></li>
@@ -227,6 +240,157 @@
     </div>
     <!-- 导包template -->
     <script src="./js/template-web.js"></script>
+
+    <!-- 最新资讯模板 -->
+    <script id='temp' type='text/html'>
+    {{each data.data}}
+    <div class="common_news_list">
+        <a href="./article.html?id={{$value.id}}" class="list_pic"><img src="{{$value.cover}}" alt=""></a>
+        <h4><a href="./article.html?id={{$value.id}}">{{$value.title}}</a></h4>
+        <p>
+            {{@ $value.intro}}
+        </p>
+        <div class="new_info">
+            <span>标签：{{$value.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{$value.read}}
+                )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{$value.comments}} )</span>
+            <b>发布于 {{$value.date}}</b>
+        </div>
+    </div>
+    {{/each}}
+    </script>
+
+    <!-- 一周热门排行榜 -->
+    <script id='hotList' type='text/html'>
+    {{each data v}}
+    <li><span>{{$index+1}}</span><a href="./article.html?id={{v.id}}">{{v.title}}</a></li>
+    {{/each}}
+    </script>
+
+    <!-- 最新评论 -->
+    <script id='latestComments' type='text/html'>
+    {{each data v}}
+    <li>
+        <span>{{v.author.charAt(0)}}</span>
+        <b><em>{{v.author}}</em> {{v.date}}说:</b>
+        <strong>{{v.intro}}</strong>
+    </li>
+    {{/each}}
+    </script>
+
+    <!-- 焦点关注 -->
+    <script id='focus' type='text/html'>
+    {{each data v}}
+    <li><a href="./article.html?id={{v.id}}">{{v.intro}}</a></li>
+    {{/each}}
+    </script>
+
+    <!-- 全部分类 -->
+    <script id='allClass' type='text/html'>
+    {{each data v}}
+    <li><a href="./list.html?id={{v.id}}">{{v.name}}</a></li>
+    {{/each}}
+    </script>
+
+    <script>
+        $(function() {
+            function getData(a, b, page, callback) {
+                $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/v1/index/search",
+                    data: {
+                        type: a,
+                        key: b,
+                        page: page
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        console.log(response);
+                        if (response.data.data.length > 0) {
+                            if (response.code == 200) {
+                                let temp = template("temp", response);
+                                $(".left_con .list_title").html("<div class='list_title'><h3>" + response.data.data[0].category + "</h3></div>" + temp);
+                                callback && callback(response)
+                            }
+                        } else {
+                            $(".left_con .list_title h3").html("没有数据")
+                        }
+                    }
+                });
+            }
+
+            let value = window.location.search;
+            let value1 = value.split("=")[0];
+            let value2 = value.split("=")[1];
+            if (value == '') {
+                window.location.href = "./index.html"
+            } else if (value1 == "?id") {
+                /* $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/v1/index/search",
+                    data: {
+                        type: value2,
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        // console.log(response);
+                        if (response.data.data.length > 0) {
+                            if (response.code == 200) {
+                                let temp = template("temp", response);
+                                $(".left_con .list_title h3").html(response.data.data[0].category)
+                                $(".left_con .list_title").after(temp);
+                            }
+                        } else {
+                            $(".left_con .list_title h3").html("没有数据")
+                        }
+                    }
+                }); */
+                getData(value2, '', 1, function(response) {
+                    $("#pagination").pagination({
+                        currentPage: 1,
+                        totalPage: Math.ceil(response.data.totalCount / 6),
+                        callback: function(current) {
+                            getData(value2, '', current)
+                        }
+                    });
+                })
+            } else {
+                value2 = decodeURI(value2)
+                // console.log(value2);
+                /* $.ajax({
+                    type: "get",
+                    url: "http://localhost:8080/api/v1/index/search",
+                    data: {
+                        key: value2,
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        // console.log(response);
+                        if (response.data.data.length > 0) {
+                            if (response.code == 200) {
+                                let temp = template("temp", response);
+                                $(".left_con .list_title h3").html(response.data.data[0].category)
+                                $(".left_con .list_title").after(temp);
+                            }
+                        } else {
+                            $(".left_con .list_title h3").html("没有数据")
+                        }
+                    }
+                }); */
+                getData('', value2, 1, function(response) {
+                    $(".list_title h3").html("搜索关键词：" + value2);
+                    $("#pagination").pagination({
+                        currentPage: 1,
+                        totalPage: Math.ceil(response.data.totalCount / 6),
+                        callback: function(current) {
+                            getData('', value2, current)
+                        }
+                    });
+                })
+            }
+        })
+    </script>
+
+    <script src="./js/same.js"></script>
 </body>
 
 </html>
