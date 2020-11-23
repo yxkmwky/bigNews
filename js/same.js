@@ -58,4 +58,16 @@ $(function() {
             }
         }
     });
+
+    // 文章搜索
+    $(".search_btn").on("click", function() {
+        let key = $(".search_txt").val().trim();
+        window.location.href = "./list.html?key=" + key
+    });
+
+    $(".search_txt").on("keyup", function(e) {
+        if (e.keyCode == 13) {
+            $(".search_btn").click()
+        }
+    });
 })
