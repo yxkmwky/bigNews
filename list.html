@@ -293,13 +293,15 @@
 
     <script>
         $(function() {
-            function getData(a, b, page, callback) {
+            function getData(a, value, page, callback) {
                 $.ajax({
                     type: "get",
                     url: "http://localhost:8080/api/v1/index/search",
                     data: {
-                        type: a,
-                        key: b,
+                        // type: a,
+                        // key: b,
+                        // 对象的key作为变量保存要在变量名外加上[]
+                        [a]: value,
                         page: page
                     },
                     dataType: "json",
@@ -344,12 +346,12 @@
                         }
                     }
                 }); */
-                getData(value2, '', 1, function(response) {
+                getData("type", value2, 1, function(response) {
                     $("#pagination").pagination({
                         currentPage: 1,
                         totalPage: Math.ceil(response.data.totalCount / 6),
                         callback: function(current) {
-                            getData(value2, '', current)
+                            getData("type", value2, current)
                         }
                     });
                 })
@@ -376,13 +378,13 @@
                         }
                     }
                 }); */
-                getData('', value2, 1, function(response) {
+                getData("key", value2, 1, function(response) {
                     $(".list_title h3").html("搜索关键词：" + value2);
                     $("#pagination").pagination({
                         currentPage: 1,
                         totalPage: Math.ceil(response.data.totalCount / 6),
                         callback: function(current) {
-                            getData('', value2, current)
+                            getData("key", value2, current)
                         }
                     });
                 })
